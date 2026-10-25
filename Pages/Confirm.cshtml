@@ -1,0 +1,159 @@
+@page "/Confirm"
+@model ConfirmModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>SATC Enrollment</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <script src="/js/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            setTimeout("window.print()", 100);
+        });
+    </script>
+</head>
+<body>
+<br />
+<center>
+    <table style="height:50px;width:900px;">
+        <tr>
+            <td style="vertical-align:top;width:50%;text-align:left;"><img alt="Logo" src="/images/logo.png" /></td>
+            <td style="vertical-align:middle;width:50%;text-align:center;font-weight:bold;font-size:18pt;">Spring HS Course Enrollment Request</td>
+        </tr>
+    </table>
+    <table class="no-print" style="height:50px;width:500px;">
+        <tr>
+            <td style="vertical-align:top;width:33%;text-align:right;"><img alt="" src="/images/right arrow - web.png" /></td>
+            <td style="vertical-align:top;width:33%;text-align:center;">
+                <input type="button" onclick="window.print()" value="Print This Page!" />
+            </td>
+            <td style="vertical-align:top;width:33%;text-align:left;"><img alt="" src="/images/left arrow - web.png" /></td>
+        </tr>
+    </table>
+    @if (!string.IsNullOrEmpty(Model.DatabaseMessage))
+    {
+        <p class="notice no-print">@Model.DatabaseMessage</p>
+    }
+    <p><mark><u>This form must be printed, signed, and turned in to your counselor.</u></mark></p>
+    <hr />
+    <table>
+        <tr>
+            <td style="font-weight:bold;">First Name</td>
+            <td>@Model.FirstName</td>
+            <td style="font-weight:bold;">Last Name</td>
+            <td>@Model.LastName</td>
+            <td style="font-weight:bold;">Last 4 Digits of SSN</td>
+            <td>@Model.Ssn</td>
+        </tr>
+    </table>
+    <table class="maintable" style="border-collapse:collapse;">
+        <tr>
+            <td>Location</td>
+            <td>Course Name</td>
+            <td>Course #</td>
+            <td>Semester</td>
+            <td>Section</td>
+            <td>Faculty</td>
+            <td>Memo</td>
+            <td>Credit Hrs</td>
+            <td>Cost</td>
+        </tr>
+        @foreach (var row in Model.Rows)
+        {
+            <tr>
+                <td>@row.Campus</td>
+                <td>@row.CourseName</td>
+                <td>@row.CourseNumber</td>
+                <td>@row.Semester</td>
+                <td>@row.Section</td>
+                <td>@row.Faculty</td>
+                <td>@row.Memo</td>
+                <td style="text-align:right;">@row.Credits</td>
+                <td style="text-align:right;">@row.Cost</td>
+            </tr>
+        }
+        <tr>
+            <td colspan="7" style="border:none;">&nbsp;</td>
+            <td style="border:none;text-align:right;">Total</td>
+            <td style="border:none;text-align:right;">@Model.Total</td>
+        </tr>
+    </table>
+    <table class="smallbox" style="width:900px;">
+        <tr>
+            <td style="text-align:left;">
+                <b>Payment Options</b><br />
+                Students will have up to <b>seven business days after the first day of high school </b>to pay half of the total bill. The remaining amount is due November 20th for the Fall semester and April 20th for the Spring semester. If payment is not received or a payment plan has not been requested, the student will be unenrolled in the course.<br /><br />
+                Students will be billed after enrollment is complete. Payment will be due according to the date on the bill. <b>If you have a previous account balance, you will not be able to enroll into future semesters.</b><br /><br />
+                To qualify for the following payment plan - a student must have a minimum <b>semester</b> balance of $200 to qualify. Payment dates will reflect on enrollment form when printed.<br /><br />
+                Payments may be made directly to SATC by mail ATTN: Janie Klaus, 2562 Centennial Road, Salina, KS 67401, by phone at 785-309-3100, or online as per instructions on enrollment form.
+            </td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <table class="smallbox" style="width:350px;">
+                    <tr style="text-align:center">
+                        <th>Fall Due Date</th>
+                        <th>% of Balance Due</th>
+                        <th>Spring Due Date</th>
+                        <th>% of Balance Due</th>
+                    </tr>
+                    <tr style="text-align:center"><td>Sep 1st</td><td>50%</td><td>Feb 20th</td><td>50%</td></tr>
+                    <tr style="text-align:center"><td>Oct 1st</td><td>75%</td><td>Mar 20th</td><td>75%</td></tr>
+                    <tr style="text-align:center"><td>Nov 1st</td><td>100%</td><td>Apr 20th</td><td>100%</td></tr>
+                </table>
+            </td>
+            <td>
+                <b>Important Dates</b><br />
+                &nbsp;&nbsp;- Last Day to Drop for 100% Refund* - 7 Days after class has started<br />
+                &nbsp;&nbsp;- Last Day to Drop for 50% Refund* - 12 Days after class has started<br />
+                &nbsp;&nbsp;- Last Day to withdraw with no transcript - 20 Days after class has started<br />
+                &nbsp;&nbsp;- Last Day to withdraw with a W - 12 weeks after class has started<br />
+            </td>
+        </tr>
+    </table>
+    <table style="width:900px;">
+        <tr>
+            <td style="text-align:left; font-size: 9pt;">
+                I certify that the information that I have completed on this form is correct. I also understand that there are minimum assessment and program standards that I must adhere to in order to be accepted and remain in the concurrent program at SATC. Failure on my part to maintain minimum performance standards and comply with College program requirements may result in my dismissal from the program.
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center>
+                    Student Signature ______________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date ______________________________<br /><br />
+                    Parent Signature _______________________________________&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Date ______________________________
+                </center>
+            </td>
+        </tr>
+    </table>
+    <br /><hr />
+    <b>TO BE COMPLETED BY THE HIGH SCHOOL</b>
+    <p>
+        A current high school transcript and KAP score must be submitted that documents that the minimum requirements have been met. A student may also use ACT, SAT, Accuplacer, or Compass scores in place of a KAP score.
+        <i>(2.5 GPA for Technical Coursework and 2.5 for Academic Coursework)</i><br /><br />
+        GPA ___________ &nbsp;&nbsp;State Assessment Score ___________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>Other (Test &amp; Score) __________________ </i><br /><br />
+        HS Counselor Name (print) _____________________________  Signature ______________________________
+    </p>
+    <table style="border: 2px solid black;width:800px;">
+        <tr>
+            <td style="text-align:center;font-weight:bold;">TO BE COMPLETED BY THE HIGH SCHOOL PRINCIPAL</td>
+        </tr>
+        <tr>
+            <td style="font-size:11pt;">
+                I certify that the above-named student is enrolled as at least a high school sophomore, or is certified as "gifted" with an IEP (copy must be attached) that specifies college study, and has permission to enroll at Salina Area Technical College for college credit. I understand that failure by the student to comply with College and program requirements may result in student dismissal from the concurrent program.<br /><br />
+                Signature of High School Principal _____________________________________ Date ________________
+            </td>
+        </tr>
+    </table>
+    <p style="font-size:8pt;width:900px;">
+        Salina Area Technical College does not discriminate on the basis of race, religion, color, sex (including pregnancy and gender identity), sexual orientation, parental status, national origin, age, disability, family medical history or genetic information, military service, or any other non-merit based factor in admission or access to, or treatment or employment in, its programs and activities. Any person having inquiries concerning compliance with the regulations implementing Title VI, Title VII, ADA, Title IX, Section 504, Title II, GINA, is directed to contact the Human Resources Specialist, 2562 Centennial Rd, Salina, KS 67401, 785-309-3100.
+    </p>
+</center>
+</body>
+</html>

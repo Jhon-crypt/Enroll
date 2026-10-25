@@ -1,0 +1,36 @@
+@page "/Login"
+@model LoginModel
+<script type="text/javascript">
+    function formValidate() {
+        if ($("#login_id").val() == "" || $("#password").val() == "") {
+            alert("Please complete all fields before continuing.");
+            return false;
+        }
+        return true;
+    }
+</script>
+<br />
+<center>
+    <span style="color:red;font-size:12pt;">@Model.Message</span>
+    <form method="post" action="/Login?Login=1" name="frmLogin" onsubmit="return formValidate()">
+        <table>
+            <tr>
+                <td>Last Name</td>
+                <td><input type="text" name="last_name" id="last_name" style="width:200px;" /></td>
+            </tr>
+            <tr>
+                <td>Last 4 Digits of SSN</td>
+                <td><input type="text" name="login_id" id="login_id" style="width:200px;" /></td>
+            </tr>
+            <tr>
+                <td>4 Digit Year of Birth (YYYY)</td>
+                <td><input type="text" name="birth_year" id="birth_year" style="width:200px;" /></td>
+            </tr>
+        </table>
+        <br />
+        <div style="width:100%;text-align:center;">
+            <input type="submit" name="cmdNext" class="round-button" value="Login" />
+        </div>
+    </form>
+</center>
+<br />

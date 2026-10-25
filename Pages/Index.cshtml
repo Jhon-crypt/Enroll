@@ -1,0 +1,42 @@
+@page "/"
+@model IndexModel
+<script type="text/javascript">
+    function formValidate() {
+        if ($("#first_name").val() == "" || $("#last_name").val() == "" || $("#ssn").val() == "") {
+            alert("Please complete all fields before continuing.");
+            return false;
+        }
+        return true;
+    }
+</script>
+<br />
+<center>
+    @if (!string.IsNullOrEmpty(Model.DatabaseMessage))
+    {
+        <p class="notice">@Model.DatabaseMessage</p>
+    }
+    <strong>Record Found</strong>
+    <form method="post" action="/Enroll" name="frmEnroll" onsubmit="return formValidate()">
+        <table>
+            <tr>
+                <td>First Name</td>
+                <td><input readonly="readonly" type="text" name="first_name" id="first_name" style="width:247px;" value="@Model.FirstName" /></td>
+            </tr>
+            <tr>
+                <td>Last Name</td>
+                <td><input readonly="readonly" type="text" name="last_name" id="last_name" style="width:247px;" value="@Model.LastName" /></td>
+            </tr>
+            <tr>
+                <td>Last 4 Digits of SSN</td>
+                <td><input readonly="readonly" type="text" name="ssn" id="ssn" maxlength="4" style="width:247px;" value="@Model.Ssn" /></td>
+            </tr>
+        </table>
+        <br />
+        <div style="width:100%;text-align:center;">
+            <input type="button" class="round-button" style="width:125px" onclick="location.href='/Logout'" value="<< Start Over" />&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="submit" name="cmdNext" class="round-button" style="width:125px" value="Continue >>" />
+        </div>
+        <input type="hidden" name="term" value="Spring 202627" />
+    </form>
+</center>
+<br />

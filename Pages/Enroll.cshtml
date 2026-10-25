@@ -1,0 +1,76 @@
+@page "/Enroll"
+@model EnrollModel
+@using Enroll.Services
+<script src="/js/enroll.js"></script>
+<br />
+<center>
+    @if (!string.IsNullOrEmpty(Model.DatabaseMessage))
+    {
+        <p class="notice">@Model.DatabaseMessage</p>
+    }
+    <form method="post" id="frmEnroll2" action="/Confirm">
+        <input type="hidden" id="numCourses" name="numCourses" value="@Model.CourseCount" />
+        <table class="maintable" style="border-collapse:collapse;">
+            <tr>
+                <td>Location</td>
+                <td>Course Name</td>
+                <td>Course #</td>
+                <td>Semester</td>
+                <td>Section</td>
+                <td>Faculty</td>
+                <td>Memo</td>
+                <td>Credit Hrs</td>
+                <td>Cost</td>
+            </tr>
+            @foreach (var row in EnrollmentText.VisibleRows(Model.CourseCount, Model.Deleted))
+            {
+                var selected = Model.SelectedCampus(row);
+                <tr>
+                    <td>
+                        <select class="campus" id="campus@(row)" name="campus@(row)" onchange="populateCourses(@row)">
+                            <option value="none">Select a location</option>
+                            @foreach (var campus in Model.Campuses)
+                            {
+                                if (selected == campus.Code)
+                                {
+                                    <option selected="selected" value="@campus.Code">@campus.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@campus.Code">@campus.Name</option>
+                                }
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <select class="course" name="hs_course_@(row)" id="hs_course_@(row)" onchange="lookupCourse(@row)">
+                            <option value="">Select a location first</option>
+                        </select>
+                    </td>
+                    <td><a id="course_num_@(row)"></a><input type="hidden" name="course_num_@(row)" id="t_course_num_@(row)" /></td>
+                    <td><a id="semester_@(row)"></a><input type="hidden" name="semester_@(row)" id="t_semester_@(row)" /></td>
+                    <td>
+                        <select id="section_@(row)" name="section_@(row)" onchange="setSection(@row)">
+                            <option value="1">Section 1</option>
+                        </select>
+                    </td>
+                    <td><a id="faculty_@(row)"></a><input type="hidden" name="faculty_@(row)" id="t_faculty_@(row)" /></td>
+                    <td><a id="time_@(row)"></a><input type="hidden" name="time_@(row)" id="t_time_@(row)" /></td>
+                    <td style="text-align:right;"><a class="credits" id="credit_hours_@(row)"></a><input type="hidden" name="credit_hours_@(row)" id="t_credit_hours_@(row)" /></td>
+                    <td style="text-align:right;"><a class="cost" id="cost_@(row)"></a><input type="hidden" name="cost_@(row)" id="t_cost_@(row)" /></td>
+                </tr>
+            }
+            <tr>
+                <td colspan="7" style="text-align:left;border:none;"><a class="round-button" onclick="addCourse()" style="cursor:pointer;font-size:10pt;width:200px;height:30px;padding-top:5px;padding-bottom:5px;display:inline;">Add Another Course</a></td>
+                <td style="border:none;text-align:right;">Total</td>
+                <td style="border:none;text-align:right;"><a id="total_cost"></a><input type="hidden" name="total_cost" id="t_total_cost" /></td>
+            </tr>
+        </table>
+        <br />
+        <div style="width:100%;text-align:center;">
+            <input type="button" class="round-button" value="<< Back" onclick="location.href='/'" />&nbsp;&nbsp;
+            <input type="submit" class="round-button" value="Next >>" />
+        </div>
+    </form>
+</center>
+<br />

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>Enroll</RootNamespace>
+    <AssemblyName>Enroll</AssemblyName>
+    <DefaultItemExcludes>$(DefaultItemExcludes);Fall/**;Spring/**;Summer/**;V1/**;V2/**;V3/**;js/**;Images/**;css/**;Enroll.Tests/**;**/*.sql;**/*.aspx;**/*.asax;**/*.config;**/*.txt</DefaultItemExcludes>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+  </ItemGroup>
+</Project>
