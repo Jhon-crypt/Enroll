@@ -1,5 +1,7 @@
 using System.Net;
 using Enroll.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +23,13 @@ public class EnrollmentTextTests
     public void SectionList_does_not_invent_sections_that_are_missing()
     {
         Assert.Equal("1,3", EnrollmentText.SectionList(new[] { "3", "1", "3", " " }));
+    }
+
+    [Fact]
+    public void Addresses_stay_inside_the_school_folder()
+    {
+        Assert.Equal("/Enroll/Login?Login=1", AppUrls.Under("/Enroll", "/Login?Login=1"));
+        Assert.Equal("/css/site.css", AppUrls.Under("", "/css/site.css"));
     }
 
     [Fact]
@@ -67,6 +76,56 @@ public class SiteTests : IClassFixture<EnrollmentApplication>
         var body = await response.Content.ReadAsStringAsync();
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Contains("database is not connected yet", body);
+    }
+}
+
+public class SchoolFolderTests : IClassFixture<SchoolFolderApplication>
+{
+    private readonly HttpClient _client;
+
+    public SchoolFolderTests(SchoolFolderApplication application)
+    {
+        _client = application.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = false });
+    }
+
+    [Fact]
+    public async Task Login_keeps_the_design_inside_the_school_folder()
+    {
+        var response = await _client.GetAsync("/Enroll/Login");
+        var body = await response.Content.ReadAsStringAsync();
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Contains("/Enroll/css/site.css", body);
+        Assert.Contains("/Enroll/images/logo.png", body);
+        Assert.Contains("action=\"/Enroll/Login?Login=1\"", body);
+    }
+}
+
+public sealed class SchoolFolderApplication : WebApplicationFactory<Program>
+{
+    protected override void ConfigureWebHost(Microsoft.AspNetCore.Hosting.IWebHostBuilder builder)
+    {
+        builder.ConfigureServices(services => services.AddSingleton<IStartupFilter, SchoolFolderPrefix>());
+    }
+}
+
+public sealed class SchoolFolderPrefix : IStartupFilter
+{
+    public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+    {
+        return app =>
+        {
+            app.Use(async (context, nextMiddleware) =>
+            {
+                if (context.Request.Path.StartsWithSegments("/Enroll", out var rest))
+                {
+                    context.Request.PathBase = context.Request.PathBase.Add("/Enroll");
+                    context.Request.Path = rest.HasValue ? rest : "/";
+                }
+
+                await nextMiddleware();
+            });
+            next(app);
+        };
     }
 }
 

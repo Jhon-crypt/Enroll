@@ -8,8 +8,8 @@
 <head>
     <meta charset="utf-8" />
     <title>SATC Enrollment</title>
-    <link rel="stylesheet" href="/css/site.css" />
-    <script src="/js/jquery-1.9.1.min.js"></script>
+    <link rel="stylesheet" href="@Url.Content("~/css/site.css")" />
+    <script src="@Url.Content("~/js/jquery-1.9.1.min.js")"></script>
     <script type="text/javascript">
         $(document).ready(function () {
             setTimeout("window.print()", 100);
@@ -21,17 +21,17 @@
 <center>
     <table style="height:50px;width:900px;">
         <tr>
-            <td style="vertical-align:top;width:50%;text-align:left;"><img alt="Logo" src="/images/logo.png" /></td>
+            <td style="vertical-align:top;width:50%;text-align:left;"><img alt="Logo" src="@Url.Content("~/images/logo.png")" /></td>
             <td style="vertical-align:middle;width:50%;text-align:center;font-weight:bold;font-size:18pt;">Spring HS Course Enrollment Request</td>
         </tr>
     </table>
     <table class="no-print" style="height:50px;width:500px;">
         <tr>
-            <td style="vertical-align:top;width:33%;text-align:right;"><img alt="" src="/images/right arrow - web.png" /></td>
+            <td style="vertical-align:top;width:33%;text-align:right;"><img alt="" src="@Url.Content("~/images/right arrow - web.png")" /></td>
             <td style="vertical-align:top;width:33%;text-align:center;">
                 <input type="button" onclick="window.print()" value="Print This Page!" />
             </td>
-            <td style="vertical-align:top;width:33%;text-align:left;"><img alt="" src="/images/left arrow - web.png" /></td>
+            <td style="vertical-align:top;width:33%;text-align:left;"><img alt="" src="@Url.Content("~/images/left arrow - web.png")" /></td>
         </tr>
     </table>
     @if (!string.IsNullOrEmpty(Model.DatabaseMessage))

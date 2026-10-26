@@ -16,7 +16,7 @@
         <p class="notice">@Model.DatabaseMessage</p>
     }
     <strong>Record Found</strong>
-    <form method="post" action="/Enroll" name="frmEnroll" onsubmit="return formValidate()">
+    <form method="post" action="@Url.Content("~/Enroll")" name="frmEnroll" onsubmit="return formValidate()">
         <table>
             <tr>
                 <td>First Name</td>
@@ -33,7 +33,7 @@
         </table>
         <br />
         <div style="width:100%;text-align:center;">
-            <input type="button" class="round-button" style="width:125px" onclick="location.href='/Logout'" value="<< Start Over" />&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" class="round-button" style="width:125px" onclick="location.href='@Url.Content("~/Logout")'" value="<< Start Over" />&nbsp;&nbsp;&nbsp;&nbsp;
             <input type="submit" name="cmdNext" class="round-button" style="width:125px" value="Continue >>" />
         </div>
         <input type="hidden" name="term" value="Spring 202627" />

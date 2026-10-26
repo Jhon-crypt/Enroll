@@ -272,7 +272,7 @@ public class EnrollmentDb
                 using var reader = facultyCommand.ExecuteReader();
                 if (reader.Read())
                 {
-                    faculty = Text(reader, "last_name") + "|";
+                    faculty = Text(reader, "last_name");
                 }
             }
 
@@ -302,7 +302,11 @@ public class EnrollmentDb
                 }
             }
 
-            payload += faculty;
+            if (found)
+            {
+                payload += faculty + "|";
+            }
+
             payload += fee.ToString(CultureInfo.InvariantCulture) + "|";
             return new CourseDescription { Found = found, Payload = payload, CourseId = courseKey };
         });

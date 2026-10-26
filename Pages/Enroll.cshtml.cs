@@ -28,7 +28,7 @@ public class EnrollModel : PageModel
     {
         if (HttpContext.Session.GetString("Authenticated") != "true")
         {
-            return Redirect("/Login?Message=" + Uri.EscapeDataString("Please Login To Continue"));
+            return Redirect(AppUrls.Under(Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Please Login To Continue")));
         }
 
         if (!string.IsNullOrEmpty(Request.Form["cmdNext"]))

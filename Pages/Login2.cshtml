@@ -11,7 +11,7 @@
 <br />
 <center>
     <span style="color:red;font-size:12pt;">@Request.Query["Message"]</span>
-    <form method="post" action="/Login?Login=1" name="frmLogin" onsubmit="return formValidate()">
+    <form method="post" action="@(Url.Content("~/Login") + "?Login=1")" name="frmLogin" onsubmit="return formValidate()">
         <table>
             <tr>
                 <td>Last Name</td>

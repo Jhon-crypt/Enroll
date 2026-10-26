@@ -39,7 +39,7 @@ public class LoginModel : PageModel
             var student = _database.FindStudent(last4, lastName, birthYear);
             if (student == null)
             {
-                return Redirect("/Login?Message=" + Uri.EscapeDataString("Login Incorrect"));
+                return Redirect(AppUrls.Under(Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Login Incorrect")));
             }
 
             HttpContext.Session.SetString("soc_sec", student.SocSec);
@@ -49,7 +49,7 @@ public class LoginModel : PageModel
             HttpContext.Session.SetString("ssn", student.SsnLast4);
             HttpContext.Session.SetString("camp_cod", student.CampusCode);
             HttpContext.Session.SetString("Authenticated", "true");
-            return Redirect("/");
+            return Redirect(AppUrls.Under(Request.PathBase, "/"));
         }
         catch (DatabaseUnavailableException)
         {

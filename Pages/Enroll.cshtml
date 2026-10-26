@@ -1,14 +1,14 @@
 @page "/Enroll"
 @model EnrollModel
 @using Enroll.Services
-<script src="/js/enroll.js"></script>
+<script src="@Url.Content("~/js/enroll.js")"></script>
 <br />
 <center>
     @if (!string.IsNullOrEmpty(Model.DatabaseMessage))
     {
         <p class="notice">@Model.DatabaseMessage</p>
     }
-    <form method="post" id="frmEnroll2" action="/Confirm">
+    <form method="post" id="frmEnroll2" action="@Url.Content("~/Confirm")">
         <input type="hidden" id="numCourses" name="numCourses" value="@Model.CourseCount" />
         <table class="maintable" style="border-collapse:collapse;">
             <tr>
@@ -68,7 +68,7 @@
         </table>
         <br />
         <div style="width:100%;text-align:center;">
-            <input type="button" class="round-button" value="<< Back" onclick="location.href='/'" />&nbsp;&nbsp;
+            <input type="button" class="round-button" value="<< Back" onclick="location.href='@Url.Content("~/")'" />&nbsp;&nbsp;
             <input type="submit" class="round-button" value="Next >>" />
         </div>
     </form>

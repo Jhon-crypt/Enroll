@@ -15,7 +15,7 @@ public static class EnrollmentEndpoints
     {
         if (context.Session.GetString("Authenticated") != "true")
         {
-            return Results.Redirect("/Login?Message=" + Uri.EscapeDataString("Please Login To Continue"));
+            return Results.Redirect(AppUrls.Under(context.Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Please Login To Continue")));
         }
 
         var index = context.Request.Query["index"].ToString();
@@ -104,20 +104,20 @@ public static class EnrollmentEndpoints
         var current = context.Session.GetString("NumCourses");
         var count = string.IsNullOrEmpty(current) ? 1 : int.TryParse(current, out var parsed) ? parsed : 1;
         context.Session.SetString("NumCourses", (count + 1).ToString());
-        return Results.Redirect(LocalRefer(context));
+        return Results.Redirect(AppUrls.Under(context.Request.PathBase, LocalRefer(context)));
     }
 
     private static IResult DeleteCourse(HttpContext context)
     {
         var deleted = context.Session.GetString("Deleted_Courses") ?? "";
         context.Session.SetString("Deleted_Courses", deleted + " " + context.Request.Query["Course"] + " ");
-        return Results.Redirect(LocalRefer(context));
+        return Results.Redirect(AppUrls.Under(context.Request.PathBase, LocalRefer(context)));
     }
 
     private static IResult Logout(HttpContext context)
     {
         context.Session.Clear();
-        return Results.Redirect("/");
+        return Results.Redirect(AppUrls.Under(context.Request.PathBase, "/"));
     }
 
     private static IResult OldPage(HttpContext context, string page)
@@ -135,7 +135,7 @@ public static class EnrollmentEndpoints
             "course_lookup" => "/Course_Lookup",
             _ => "/"
         };
-        return Results.Redirect(target + context.Request.QueryString);
+        return Results.Redirect(AppUrls.Under(context.Request.PathBase, target + context.Request.QueryString));
     }
 
     private static string LocalRefer(HttpContext context)

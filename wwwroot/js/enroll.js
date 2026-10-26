@@ -1,5 +1,10 @@
 var lsSection;
 
+function enrollUrl(path) {
+    var base = (window.enrollBase || "").replace(/\/$/, "");
+    return base + path;
+}
+
 function formatCurrency(lsNum) {
     lsNum = lsNum.toString().replace(/\$|\,/g, '');
     if (isNaN(lsNum)) {
@@ -36,12 +41,12 @@ function trim(stringToTrim) {
 }
 
 function setSection(index) {
-    $.ajax({ type: "POST", url: "/Course_Lookup?mode=sec&sec=" + $("#section_" + index).val() + "&hs_course=" + $("#hs_course_" + index).val() + "&index=" + index, async: false });
+    $.ajax({ type: "POST", url: enrollUrl("/Course_Lookup?") + "mode=sec&sec=" + $("#section_" + index).val() + "&hs_course=" + $("#hs_course_" + index).val() + "&index=" + index, async: false });
     lookupCourse(index);
 }
 
 function populateCourses(index) {
-    $.ajax({ type: "POST", url: "/Course_Lookup?campus=" + $("#campus" + index).val() + "&index=" + index, async: false }).done(function (data) {
+    $.ajax({ type: "POST", url: enrollUrl("/Course_Lookup?") + "campus=" + $("#campus" + index).val() + "&index=" + index, async: false }).done(function (data) {
         var iIndex = data.indexOf("COURSE_RESPONSE");
         if (iIndex != -1 && data.substr(iIndex + 15) != "") {
             $("#hs_course_" + index).html(data.substr(iIndex + 15));
@@ -54,7 +59,7 @@ function lookupCourse(index) {
     var lsNum, lsCredits, lsFac, lsTime, lsSemester, lsOnline, lsFee;
 
     if ($("#hs_course_" + index).val() == "delete") {
-        location.href = "/Delete_Course?Refer=/Enroll&Course=" + index;
+        location.href = enrollUrl("/Delete_Course?Refer=/Enroll&Course=" + index);
         return;
     }
 
@@ -73,14 +78,14 @@ function lookupCourse(index) {
         $("#t_time_" + index).val("");
         $("#t_credit_hours_" + index).val("");
         $("#t_cost_" + index).val("");
-        $.ajax({ type: "POST", url: "/Course_Lookup?hs_course=&index=" + index, async: false });
+        $.ajax({ type: "POST", url: enrollUrl("/Course_Lookup?") + "hs_course=&index=" + index, async: false });
         doTotals();
         return false;
     }
 
     $.ajax({
         type: "POST",
-        url: "/Course_Lookup?hs_course=" + $("#hs_course_" + index).val() + "&index=" + index + "&Section=" + $("#section_" + index).val() + "&Online=" + lsOnline,
+        url: enrollUrl("/Course_Lookup?") + "hs_course=" + $("#hs_course_" + index).val() + "&index=" + index + "&Section=" + $("#section_" + index).val() + "&Online=" + lsOnline,
         async: false
     }).done(function (data) {
         var iIndex = data.indexOf("COURSE_RESPONSE");
@@ -140,7 +145,7 @@ function lookupCourse(index) {
 }
 
 function addCourse() {
-    $("#frmEnroll2").attr("action", "/Add_Course?Refer=/Enroll");
+    $("#frmEnroll2").attr("action", enrollUrl("/Add_Course?Refer=/Enroll"));
     $("#frmEnroll2").submit();
 }
 

@@ -23,8 +23,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 
-app.MapGet("/error", () => Results.Content(
-    "<html><body><p>Something went wrong. Go back to the <a href=\"/Login\">sign-in page</a> and try again.</p></body></html>",
+app.MapGet("/error", (HttpContext context) => Results.Content(
+    "<html><body><p>Something went wrong. Go back to the <a href=\"" + AppUrls.Under(context.Request.PathBase, "/Login") + "\">sign-in page</a> and try again.</p></body></html>",
     "text/html"));
 
 app.MapRazorPages();
