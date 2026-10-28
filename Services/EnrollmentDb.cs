@@ -46,6 +46,13 @@ public sealed class CourseDescription
     public bool Found { get; init; }
     public string Payload { get; init; } = "";
     public string CourseId { get; init; } = "";
+    public string Title { get; init; } = "";
+    public string CourseNumber { get; init; } = "";
+    public string Semester { get; init; } = "";
+    public string Faculty { get; init; } = "";
+    public string Memo { get; init; } = "";
+    public string Credits { get; init; } = "";
+    public decimal Cost { get; init; }
 }
 
 public class EnrollmentDb
@@ -234,6 +241,11 @@ public class EnrollmentDb
             var found = false;
             var courseKey = "";
             var facultyId = "";
+            var title = "";
+            var courseCode = "";
+            var semesterName = "";
+            var memo = "";
+            var creditsText = "";
             decimal credits = 0;
             decimal fee = 0;
             var sid = "";
@@ -245,18 +257,23 @@ public class EnrollmentDb
                     found = true;
                     courseKey = Text(reader, "crs_id");
                     facultyId = Text(reader, "lead_fac");
+                    title = Text(reader, "crs_txt");
+                    courseCode = Text(reader, "course");
+                    creditsText = Text(reader, "credits");
+                    semesterName = Text(reader, "sm_desc");
+                    memo = Text(reader, "memo");
                     credits = Number(reader, "credits");
                     fee = credits * Number(reader, "npercred");
                     sid = Text(reader, "sid");
                     payload = string.Join("|",
-                        Text(reader, "crs_txt"),
-                        Text(reader, "course"),
+                        title,
+                        courseCode,
                         Text(reader, "dept_cod"),
-                        Text(reader, "credits"),
+                        creditsText,
                         Text(reader, "npercred"),
-                        Text(reader, "sm_desc"),
+                        semesterName,
                         Text(reader, "camp_txt").Replace("'", ""),
-                        Text(reader, "memo")) + "|";
+                        memo) + "|";
                 }
                 else
                 {
@@ -308,7 +325,19 @@ public class EnrollmentDb
             }
 
             payload += fee.ToString(CultureInfo.InvariantCulture) + "|";
-            return new CourseDescription { Found = found, Payload = payload, CourseId = courseKey };
+            return new CourseDescription
+            {
+                Found = found,
+                Payload = payload,
+                CourseId = courseKey,
+                Title = title,
+                CourseNumber = courseCode,
+                Semester = semesterName,
+                Faculty = faculty,
+                Memo = memo,
+                Credits = creditsText,
+                Cost = fee
+            };
         });
     }
 

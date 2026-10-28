@@ -1,3 +1,4 @@
+using System.Globalization;
 using Enroll.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -53,7 +54,6 @@ public class ConfirmModel : PageModel
         FirstName = HttpContext.Session.GetString("first_name") ?? "";
         LastName = HttpContext.Session.GetString("last_name") ?? "";
         Ssn = HttpContext.Session.GetString("ssn") ?? "";
-        Total = Request.Form["total_cost"].ToString();
 
         var countText = HttpContext.Session.GetString("NumCourses");
         var count = int.TryParse(countText, out var parsed) ? parsed : 0;
@@ -63,18 +63,51 @@ public class ConfirmModel : PageModel
 
         foreach (var index in EnrollmentText.VisibleRows(count, deleted))
         {
-            var courseId = Request.Form["hs_course_" + index].ToString();
-            if (!int.TryParse(courseId, out var courseNumber))
+            var postedCourse = Request.Form["hs_course_" + index].ToString().Trim();
+            var courseId = int.TryParse(postedCourse, out var courseNumber)
+                ? postedCourse
+                : (HttpContext.Session.GetString("hs_course_" + index) ?? "").Trim();
+            if (!int.TryParse(courseId, out courseNumber))
             {
                 continue;
             }
 
-            var costText = Request.Form["cost_" + index].ToString();
-            var campus = Request.Form["campus" + index].ToString();
+            var campus = Chosen(Request.Form["campus" + index].ToString(), "camp_cod_" + index);
+            var section = Chosen(Request.Form["section_" + index].ToString(), "section_" + index);
+            if (string.IsNullOrEmpty(section))
+            {
+                section = "1";
+            }
+
+            var courseNumberText = Request.Form["course_num_" + index].ToString().Trim();
+            var semesterText = Request.Form["semester_" + index].ToString().Trim();
+            var faculty = Request.Form["faculty_" + index].ToString().Trim();
+            var memo = Request.Form["time_" + index].ToString().Trim();
+            var credits = Request.Form["credit_hours_" + index].ToString().Trim();
+            var costText = Request.Form["cost_" + index].ToString().Trim();
             var title = "";
             try
             {
-                title = _database.CourseTitle(courseNumber);
+                if (string.IsNullOrEmpty(courseNumberText) || string.IsNullOrEmpty(semesterText) || string.IsNullOrEmpty(faculty) || string.IsNullOrEmpty(memo) || string.IsNullOrEmpty(credits) || string.IsNullOrEmpty(costText))
+                {
+                    var described = _database.DescribeCourse(campus, courseNumber, section, year, semester);
+                    title = described.Title;
+                    courseNumberText = Or(courseNumberText, described.CourseNumber);
+                    semesterText = Or(semesterText, described.Semester);
+                    faculty = Or(faculty, described.Faculty);
+                    memo = Or(memo, described.Memo);
+                    credits = Or(credits, described.Credits);
+                    if (string.IsNullOrEmpty(costText) && described.Found)
+                    {
+                        costText = described.Cost.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+                    }
+                }
+
+                if (string.IsNullOrEmpty(title))
+                {
+                    title = _database.CourseTitle(courseNumber);
+                }
+
                 if (EnrollmentText.TryParseMoney(costText, out var cost))
                 {
                     _database.SaveEnrollment(
@@ -85,7 +118,7 @@ public class ConfirmModel : PageModel
                         HttpContext.Session.GetString("hs_course_" + index) ?? courseId,
                         semester,
                         year,
-                        Request.Form["section_" + index].ToString(),
+                        section,
                         cost);
                 }
                 else
@@ -102,17 +135,43 @@ public class ConfirmModel : PageModel
             {
                 Campus = campus,
                 CourseName = title,
-                CourseNumber = Request.Form["course_num_" + index].ToString(),
-                Semester = Request.Form["semester_" + index].ToString(),
-                Section = Request.Form["section_" + index].ToString(),
-                Faculty = Request.Form["faculty_" + index].ToString(),
-                Memo = Request.Form["time_" + index].ToString(),
-                Credits = Request.Form["credit_hours_" + index].ToString(),
+                CourseNumber = courseNumberText,
+                Semester = semesterText,
+                Section = section,
+                Faculty = faculty,
+                Memo = memo,
+                Credits = credits,
                 Cost = costText
             });
+        }
+
+        Total = Request.Form["total_cost"].ToString();
+        if (Rows.Count > 0 && (!EnrollmentText.TryParseMoney(Total, out var postedTotal) || postedTotal == 0))
+        {
+            var sum = 0m;
+            foreach (var row in Rows)
+            {
+                if (EnrollmentText.TryParseMoney(row.Cost, out var rowCost))
+                {
+                    sum += rowCost;
+                }
+            }
+
+            if (sum > 0)
+            {
+                Total = sum.ToString("C", CultureInfo.GetCultureInfo("en-US"));
+            }
         }
 
         HttpContext.Session.Clear();
         return Page();
     }
+
+    private string Chosen(string posted, string sessionKey)
+    {
+        var value = posted.Trim();
+        return string.IsNullOrEmpty(value) ? (HttpContext.Session.GetString(sessionKey) ?? "").Trim() : value;
+    }
+
+    private static string Or(string posted, string remembered) => string.IsNullOrEmpty(posted) ? remembered : posted;
 }
