@@ -146,13 +146,13 @@ public class SampleDatabase : EnrollmentDb
 
     public override string FindSemesterCode(string description) => "SP";
 
-    public override string CourseTitle(int courseId) => "Welding";
+    public override string CourseTitle(string courseId) => "Welding";
 
-    public override CourseDescription DescribeCourse(string campus, int courseId, string section, string year, string semester)
+    public override CourseDescription DescribeCourse(string campus, string courseId, string section, string year, string semester)
         => new()
         {
             Found = true,
-            CourseId = courseId.ToString(),
+            CourseId = courseId,
             Title = "Welding",
             CourseNumber = "WLD100",
             Semester = "Spring",
@@ -249,6 +249,40 @@ public class FlowTests : IClassFixture<SampleApplication>
         Assert.Contains("Welding", printed);
         Assert.Contains("WLD100", printed);
         Assert.Contains("Smith", printed);
+        Assert.Contains("$150.00", printed);
+    }
+
+    [Fact]
+    public async Task A_text_course_id_still_fills_and_prints_the_class()
+    {
+        await _client.PostAsync("/Login?Login=1", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["last_name"] = "Student",
+            ["login_id"] = "1234",
+            ["birth_year"] = "2008"
+        }));
+        await _client.PostAsync("/Enroll", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["cmdNext"] = "Continue >>",
+            ["first_name"] = "Ada",
+            ["last_name"] = "Student",
+            ["ssn"] = "1234",
+            ["term"] = "Spring 202627"
+        }));
+        await _client.PostAsync("/Course_Lookup?campus=CENT&index=1", new StringContent(""));
+        var details = await (await _client.PostAsync("/Course_Lookup?hs_course=ENGCOMP02&index=1&Section=1", new StringContent(""))).Content.ReadAsStringAsync();
+        Assert.Contains("WLD100", details);
+
+        var printed = await (await _client.PostAsync("/Confirm", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["hs_course_1"] = "ENGCOMP02",
+            ["campus1"] = "CENT",
+            ["section_1"] = "1",
+            ["total_cost"] = "$0.00"
+        }))).Content.ReadAsStringAsync();
+
+        Assert.Contains("Welding", printed);
+        Assert.Contains("WLD100", printed);
         Assert.Contains("$150.00", printed);
     }
 }

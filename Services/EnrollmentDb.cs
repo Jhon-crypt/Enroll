@@ -213,7 +213,7 @@ public class EnrollmentDb
         });
     }
 
-    public virtual CourseDescription DescribeCourse(string campus, int courseId, string section, string year, string semester)
+    public virtual CourseDescription DescribeCourse(string campus, string courseId, string section, string year, string semester)
     {
         return Using(connection =>
         {
@@ -225,7 +225,7 @@ public class EnrollmentDb
                 Inner Join crssect on crssect.crs_id = course.crs_id And crssect.camp_cod = @campus
                 Inner Join semester on semester.semester = crssect.semester
                 Inner Join campus on campus.camp_cod = crssect.camp_cod
-                Where course.crs_id = @courseId And crssect.section = @section
+                Where RTRIM(course.crs_id) = @courseId And RTRIM(crssect.section) = @section
                     And crssect.cancel = 0 And crssect.end_dt > GETDATE()
                 Order By
                     Case When RTRIM(crssect.sch_yr) = @year And RTRIM(crssect.semester) = @semester Then 0 Else 1 End,
@@ -341,12 +341,12 @@ public class EnrollmentDb
         });
     }
 
-    public virtual string CourseTitle(int courseId)
+    public virtual string CourseTitle(string courseId)
     {
         return Using(connection =>
         {
             using var command = connection.CreateCommand();
-            command.CommandText = "Select crs_txt from course Where crs_id = @courseId";
+            command.CommandText = "Select crs_txt from course Where RTRIM(crs_id) = @courseId";
             command.Parameters.AddWithValue("@courseId", courseId);
             return command.ExecuteScalar()?.ToString()?.Trim() ?? "";
         });

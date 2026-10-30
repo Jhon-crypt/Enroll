@@ -71,14 +71,12 @@ public static class EnrollmentEndpoints
 
             try
             {
-                var description = int.TryParse(requestedCourse, out var courseId)
-                    ? database.DescribeCourse(
-                        context.Session.GetString("camp_cod_" + index) ?? "",
-                        courseId,
-                        section,
-                        context.Session.GetString("term_year") ?? "",
-                        context.Session.GetString("term_semester") ?? "")
-                    : new CourseDescription { Payload = "0|" };
+                var description = database.DescribeCourse(
+                    context.Session.GetString("camp_cod_" + index) ?? "",
+                    requestedCourse.Trim(),
+                    section,
+                    context.Session.GetString("term_year") ?? "",
+                    context.Session.GetString("term_semester") ?? "");
 
                 if (!string.IsNullOrEmpty(description.CourseId))
                 {

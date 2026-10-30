@@ -64,10 +64,10 @@ public class ConfirmModel : PageModel
         foreach (var index in EnrollmentText.VisibleRows(count, deleted))
         {
             var postedCourse = Request.Form["hs_course_" + index].ToString().Trim();
-            var courseId = int.TryParse(postedCourse, out var courseNumber)
-                ? postedCourse
-                : (HttpContext.Session.GetString("hs_course_" + index) ?? "").Trim();
-            if (!int.TryParse(courseId, out courseNumber))
+            var courseId = string.IsNullOrEmpty(postedCourse)
+                ? (HttpContext.Session.GetString("hs_course_" + index) ?? "").Trim()
+                : postedCourse;
+            if (string.IsNullOrEmpty(courseId))
             {
                 continue;
             }
@@ -90,7 +90,7 @@ public class ConfirmModel : PageModel
             {
                 if (string.IsNullOrEmpty(courseNumberText) || string.IsNullOrEmpty(semesterText) || string.IsNullOrEmpty(faculty) || string.IsNullOrEmpty(memo) || string.IsNullOrEmpty(credits) || string.IsNullOrEmpty(costText))
                 {
-                    var described = _database.DescribeCourse(campus, courseNumber, section, year, semester);
+                    var described = _database.DescribeCourse(campus, courseId, section, year, semester);
                     title = described.Title;
                     courseNumberText = Or(courseNumberText, described.CourseNumber);
                     semesterText = Or(semesterText, described.Semester);
@@ -105,7 +105,7 @@ public class ConfirmModel : PageModel
 
                 if (string.IsNullOrEmpty(title))
                 {
-                    title = _database.CourseTitle(courseNumber);
+                    title = _database.CourseTitle(courseId);
                 }
 
                 if (EnrollmentText.TryParseMoney(costText, out var cost))
