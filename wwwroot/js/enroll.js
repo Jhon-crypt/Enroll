@@ -145,8 +145,7 @@ function lookupCourse(index) {
 }
 
 function addCourse() {
-    $("#frmEnroll2").attr("action", enrollUrl("/Add_Course?Refer=/Enroll"));
-    $("#frmEnroll2").submit();
+    location.href = enrollUrl("/Add_Course?Refer=/Enroll");
 }
 
 function doTotals() {

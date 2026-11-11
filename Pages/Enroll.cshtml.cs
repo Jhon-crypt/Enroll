@@ -31,7 +31,7 @@ public class EnrollModel : PageModel
             return Redirect(AppUrls.Under(Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Please Login To Continue")));
         }
 
-        if (!string.IsNullOrEmpty(Request.Form["cmdNext"]))
+        if (Request.HasFormContentType && !string.IsNullOrEmpty(Request.Form["cmdNext"]))
         {
             HttpContext.Session.SetString("first_name", Request.Form["first_name"].ToString());
             HttpContext.Session.SetString("last_name", Request.Form["last_name"].ToString());

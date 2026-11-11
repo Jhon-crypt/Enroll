@@ -38,6 +38,14 @@ public class EnrollmentTextTests
         Assert.True(EnrollmentText.TryParseMoney("$1,250.50", out var amount));
         Assert.Equal(1250.50m, amount);
     }
+
+    [Fact]
+    public void Tuition_keeps_the_course_rate_when_the_high_school_price_is_missing()
+    {
+        Assert.Equal(150m, EnrollmentText.Tuition(3m, 50m, null));
+        Assert.Equal(150m, EnrollmentText.Tuition(3m, 50m, 50m));
+        Assert.Equal(0m, EnrollmentText.Tuition(3m, 50m, 0m));
+    }
 }
 
 public class SiteTests : IClassFixture<EnrollmentApplication>
@@ -284,6 +292,69 @@ public class FlowTests : IClassFixture<SampleApplication>
         Assert.Contains("Welding", printed);
         Assert.Contains("WLD100", printed);
         Assert.Contains("$150.00", printed);
+    }
+
+    [Fact]
+    public async Task Adding_another_class_keeps_the_student_signed_in()
+    {
+        await _client.PostAsync("/Login?Login=1", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["last_name"] = "Student",
+            ["login_id"] = "1234",
+            ["birth_year"] = "2008"
+        }));
+        await _client.PostAsync("/Enroll", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["cmdNext"] = "Continue >>",
+            ["first_name"] = "Ada",
+            ["last_name"] = "Student",
+            ["ssn"] = "1234",
+            ["term"] = "Spring 202627"
+        }));
+
+        var page = await (await _client.GetAsync("/Add_Course?Refer=/Enroll")).Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Please Login To Continue", page);
+        Assert.DoesNotContain("Last 4 Digits of SSN", page);
+        Assert.Contains("name=\"numCourses\" value=\"2\"", page);
+        Assert.Contains("id=\"campus1\"", page);
+        Assert.Contains("id=\"campus2\"", page);
+    }
+
+    [Fact]
+    public async Task After_printing_the_student_can_add_another_class_without_signing_in_again()
+    {
+        await _client.PostAsync("/Login?Login=1", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["last_name"] = "Student",
+            ["login_id"] = "1234",
+            ["birth_year"] = "2008"
+        }));
+        await _client.PostAsync("/Enroll", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["cmdNext"] = "Continue >>",
+            ["first_name"] = "Ada",
+            ["last_name"] = "Student",
+            ["ssn"] = "1234",
+            ["term"] = "Spring 202627"
+        }));
+        await _client.PostAsync("/Confirm", new FormUrlEncodedContent(new Dictionary<string, string>
+        {
+            ["campus1"] = "CENT",
+            ["hs_course_1"] = "10",
+            ["course_num_1"] = "WLD100",
+            ["semester_1"] = "Spring",
+            ["section_1"] = "1",
+            ["faculty_1"] = "Smith",
+            ["time_1"] = "Evening",
+            ["credit_hours_1"] = "3",
+            ["cost_1"] = "$150.00",
+            ["total_cost"] = "$150.00"
+        }));
+
+        var page = await (await _client.GetAsync("/Add_Course?Refer=/Enroll")).Content.ReadAsStringAsync();
+        Assert.DoesNotContain("Please Login To Continue", page);
+        Assert.DoesNotContain("Last 4 Digits of SSN", page);
+        Assert.Contains("name=\"numCourses\" value=\"2\"", page);
     }
 }
 

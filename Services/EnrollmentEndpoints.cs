@@ -5,7 +5,7 @@ public static class EnrollmentEndpoints
     public static void Map(WebApplication app)
     {
         app.MapMethods("/Course_Lookup", new[] { "GET", "POST" }, Lookup);
-        app.MapPost("/Add_Course", AddCourse);
+        app.MapMethods("/Add_Course", new[] { "GET", "POST" }, AddCourse);
         app.MapGet("/Delete_Course", DeleteCourse);
         app.MapGet("/Logout", Logout);
         app.Map("/{page}.aspx", OldPage);
@@ -99,6 +99,11 @@ public static class EnrollmentEndpoints
 
     private static IResult AddCourse(HttpContext context)
     {
+        if (context.Session.GetString("Authenticated") != "true")
+        {
+            return Results.Redirect(AppUrls.Under(context.Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Please Login To Continue")));
+        }
+
         var current = context.Session.GetString("NumCourses");
         var count = string.IsNullOrEmpty(current) ? 1 : int.TryParse(current, out var parsed) ? parsed : 1;
         context.Session.SetString("NumCourses", (count + 1).ToString());
@@ -107,6 +112,11 @@ public static class EnrollmentEndpoints
 
     private static IResult DeleteCourse(HttpContext context)
     {
+        if (context.Session.GetString("Authenticated") != "true")
+        {
+            return Results.Redirect(AppUrls.Under(context.Request.PathBase, "/Login?Message=" + Uri.EscapeDataString("Please Login To Continue")));
+        }
+
         var deleted = context.Session.GetString("Deleted_Courses") ?? "";
         context.Session.SetString("Deleted_Courses", deleted + " " + context.Request.Query["Course"] + " ");
         return Results.Redirect(AppUrls.Under(context.Request.PathBase, LocalRefer(context)));

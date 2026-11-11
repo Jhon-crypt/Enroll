@@ -13,6 +13,11 @@ public static class EnrollmentText
         return decimal.TryParse(cleaned, NumberStyles.Number, CultureInfo.InvariantCulture, out amount);
     }
 
+    public static decimal Tuition(decimal credits, decimal perCredit, decimal? highSchoolAmount)
+    {
+        return highSchoolAmount is null ? credits * perCredit : credits * highSchoolAmount.Value;
+    }
+
     public static string SectionList(IEnumerable<string?> sections)
     {
         var labels = sections

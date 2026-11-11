@@ -247,6 +247,7 @@ public class EnrollmentDb
             var memo = "";
             var creditsText = "";
             decimal credits = 0;
+            decimal perCredit = 0;
             decimal fee = 0;
             var sid = "";
 
@@ -263,7 +264,8 @@ public class EnrollmentDb
                     semesterName = Text(reader, "sm_desc");
                     memo = Text(reader, "memo");
                     credits = Number(reader, "credits");
-                    fee = credits * Number(reader, "npercred");
+                    perCredit = Number(reader, "npercred");
+                    fee = credits * perCredit;
                     sid = Text(reader, "sid");
                     payload = string.Join("|",
                         title,
@@ -298,7 +300,10 @@ public class EnrollmentDb
                 amountCommand.CommandText = "Select amount from CRSAFF Where crs_id = @courseId And affiliation_cod = 'HS'";
                 amountCommand.Parameters.AddWithValue("@courseId", courseKey);
                 var amount = amountCommand.ExecuteScalar();
-                fee = amount is null or DBNull ? 0 : credits * Convert.ToDecimal(amount, CultureInfo.InvariantCulture);
+                decimal? highSchoolAmount = amount is null or DBNull
+                    ? null
+                    : Convert.ToDecimal(amount, CultureInfo.InvariantCulture);
+                fee = EnrollmentText.Tuition(credits, perCredit, highSchoolAmount);
             }
 
             using (var feesCommand = connection.CreateCommand())

@@ -163,8 +163,23 @@ public class ConfirmModel : PageModel
             }
         }
 
-        HttpContext.Session.Clear();
+        ResetCourseSelection(count);
         return Page();
+    }
+
+    private void ResetCourseSelection(int courseCount)
+    {
+        for (var index = 1; index <= Math.Max(courseCount, 1); index++)
+        {
+            HttpContext.Session.Remove("hs_course_" + index);
+            HttpContext.Session.Remove("camp_cod_" + index);
+            HttpContext.Session.Remove("section_" + index);
+            HttpContext.Session.Remove("crs_id_" + index);
+            HttpContext.Session.Remove("campus" + index);
+        }
+
+        HttpContext.Session.SetString("NumCourses", "1");
+        HttpContext.Session.SetString("Deleted_Courses", "");
     }
 
     private string Chosen(string posted, string sessionKey)
